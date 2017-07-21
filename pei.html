@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<style>
+body,html{
+  margin:0;
+  padding:0;
+}
+</style>
+
+<body>
+  <svg width="800" height="700"></svg>
+
+  <script>
+
+    let pieData = [
+          {label: '塔里木', count: 10,color:"green"},
+          {label: '克拉玛依', count: 20,color:"blue"},
+          {label: '辽河', count: 30,color:"yellow"},
+          {label: '海油深圳', count: 160,color:"lightblue"}
+        ];
+
+    let svg = d3.select("svg"),
+      margin = {top :20,right:20,bottom:50,left:50},
+      areaWidth = svg.attr("width") - margin.left-margin.right,
+      areaHeight = svg.attr("height") - margin.top - margin.bottom,
+      g = svg.append("g")
+      .attr("transform",`translate(${margin.left},${margin.top})`)
+      .attr("width",areaWidth)
+      .attr("height",areaHeight)
+
+   let pieBox = g.append("g")
+     .attr("transform",`translate(${areaWidth/2},${areaHeight/2})`)
+     .attr("class","chart pie");
+
+   //内外半径
+   let outerRadius = 0.3*Math.min(areaWidth,areaHeight);
+   let innerRadius =areaWidth*(0.02);
+
+   //转化成弧度
+   let arc = d3.arc()
+     .innerRadius(innerRadius)
+     .outerRadius(outerRadius);
+
+  //pie数据生成器
+  let pie = d3.pie()
+       .value(function (d) {
+         return d.count
+       });
+
+  let pieDataN = pie(pieData);
+
+  let path = pieBox.selectAll("path")
+     .data(pieDataN)
+     .enter()
+     .append("path")
+     .attr("class",function (d,i) {
+       return `pie_line _${i}`})
+     .attr("d",arc)
+     .attr("fill",function (d) {
+       return d.data.color;})
+        .on("mouseenter",function (d) { //鼠标移入事件
+            d3.select(this).attr("opacity",.7)
+        })
+        .on("mouseleave",function (d) {//鼠标移出事件
+           d3.select(this).attr("opacity",1)
+        })
+
+       pieBox.selectAll("text")
+          .data(pieDataN)
+          .enter()
+          .append("text")
+          .attr("class",function (d,i) {
+            return `pie_text _${i}`
+          })
+          .attr("transform",function (d) {
+            let x = arc.centroid(d)[0]*1; //弧度坐标
+            let y = arc.centroid(d)[1]*1;
+            return `translate(${x},${y})`
+          })
+          .attr("text-anchor","middle")
+          .attr("fill","black")
+          .attr("font-size",14)
+          .text(function (d) {
+             let percent = Number(d.value)/d3.sum(pieData,function (d) {
+                 return d.count
+                 })*100;
+             return percent.toFixed(1)+"%"
+          })
+  </script>
+</body>
+
+
+
+
+
+
+
+
+
+</html>
