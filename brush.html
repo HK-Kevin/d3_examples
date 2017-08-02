@@ -149,7 +149,6 @@ body,html{
            xScale.domain(s.map(xBrush.invert, xBrush));
           zoomRect .call(zoom.transform, d3.zoomIdentity.scale(areaWidth / (s[1] - s[0]))
              .translate(-s[0], 0))
-
          }
 
 
